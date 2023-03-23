@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@1,300&display=swap');
+@font-face { font-family: 'Japones'; src: url('../fonts/Japones.ttf') }
+
+:root {
+  --color-theme: red;
+
+  --color: white;
+  --background-color: black;
+  --background-color-code: 0,0,0;
+
+  --color-reverse: black;
+  --background-color-reverse: white;
+  --background-color-code-reverse: 255,255,255;
+}
+
+.loading {
+  width: 100vw; 
+  height: 100vh; 
+  background-image: linear-gradient(to bottom right, #353535, #1f1f1f); 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center;
+}
+.loading img { width: 8vh; height: 8vh; }
+.loading a {
+  font-size: 2.8vh; 
+  letter-spacing: 0.1vw; 
+  margin-top: 3vh;
+  font-family: 'Japones', sans-serif!important;
+}
+.loading a span { color: var(--color-theme); margin-left: 0.1vw; }
+
+textarea:focus, input:focus{ outline: none; }
+body {
+  background-color: var(--background-color);
+  color: var(--color);
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  width: 100vw;
+  height: 100vh;
+}
