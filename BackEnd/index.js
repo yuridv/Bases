@@ -1,4 +1,4 @@
-console.log(`[Animes]=> Starting...`)
+console.log(`[Base]=> Starting...`)
 require('dotenv-safe').config();
 const bodyparser = require("body-parser");
 const express = require("express");
@@ -27,6 +27,6 @@ express()
   })
 
   .listen(process.env.PORT || 3000, function (err) {
-    if (err) return console.log(`[Animes]=> Error Loading:\n${err}`)
-    console.log(`[Animes]=> Successfully Loaded!`)
+    if (err) return console.log(`[Base]=> Error Loading:\n${err}`)
+    console.log(`[Base]=> Successfully Loaded!`)
   });

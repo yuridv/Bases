@@ -1,7 +1,7 @@
 {
-  "name": "concredito-dashboard",
+  "name": "backend-base",
   "version": "1.0.0",
-  "description": "dashboard",
+  "description": "Base de Back-End",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
