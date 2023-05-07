@@ -1,4 +1,4 @@
-const get = (req, res) => {
+const route = (req, res) => {
   try {
     return { status: 200 }
   } catch(err) {
@@ -8,4 +8,4 @@ const get = (req, res) => {
   }
 }
 
-module.exports = get
+module.exports = route
