@@ -1,24 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@1,300&display=swap');
-
 :root {
-  --color-theme: purple;
-  --color-theme-rgb: 128,0,128;
+  --color-theme: red;
+  --color-theme-rgb: 255,0,0;
 
   --color: white;
   --background-color: black;
   --background-color-code: 0,0,0;
 }
-
-.loading {
-  width: 100vw; 
-  height: 100vh; 
-  background-image: linear-gradient(to bottom right, #353535, #1f1f1f);
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  justify-content: center;
-}
-.loading i { font-size: 6vh; }
 
 textarea:focus, input:focus{ outline: none; }
 body {
@@ -30,4 +17,5 @@ body {
   height: 100vh;
 }
 
-a { text-decoration: none; color: white }
+a { text-decoration: none }
+p { margin: 0 }

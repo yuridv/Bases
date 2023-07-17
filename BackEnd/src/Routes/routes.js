@@ -1,25 +1,26 @@
 const { readdirSync } = require("fs");
+let routes = {}
 
-async function routes(dir = '', obj = {}) {
+module.exports = async (req, res, type, route = routes) => {
+  let params = req.params[0].replace('/','').split("/")
+  params[params.length] = type
+  for (let i = 0; i < params.length; i++) {
+    if (!route[params[i]]) return res.status(500).send({ error: `O endereço da API é invalido...` });
+    route = route[params[i]];
+  }
+  if (typeof route !== 'function') return res.status(500).send({ error: `O endereço da API está incompleto...` });
+  route = await route(req, res)
+  if (!route) return res.status(500).send({ error: `O endereço da API não retornou uma resposta...` })
+  return res.status(route.status || 200).send(route)
+}
+
+function files(dir = '', obj = {}) {
   readdirSync('./src/Routes/'+dir).forEach(async(file) => {
-    if (file == "routes.js") return;
-    if (file.split('.')[1] == "js") return obj[file.split('.')[0].toLowerCase()] = require(`${dir ? dir : '.'}/${file}`);
-    obj[file.toLowerCase()] = {}
-    await routes(`${dir ? dir : '.'}/${file}`, obj[file.toLowerCase()])
-  });
+    file = file.split('.').map(r=> r.toLowerCase())
+    if (['routes'].includes(file[0])) return;
+    if (file[1] == 'js') return obj[file[0]] = require(`${dir || '.'}/${file[0]}`)
+    obj[file[0]] = {}
+    files(`${dir || '.'}/${file[0]}`, obj[file[0]])
+  })
   return obj;
-}
-
-async function verify(routes, params) {
-  if (params[0] && routes[params[0]]) routes = routes[params[0]]
-  if (params[1] && routes[params[1]]) routes = routes[params[1]]
-  if (params[2] && routes[params[2]]) routes = routes[params[2]]
-  if (params[3] && routes[params[3]]) routes = routes[params[3]]
-  if (routes && typeof routes == 'function') return routes
-  return { error: `A rota da API não é valida...` }
-}
-
-module.exports = {
-  routes: routes().then(r=> { return r }),
-  verify: verify
-}
+}(() => { routes = files() })();
