@@ -4,9 +4,9 @@ let routes = {}
 module.exports = async (req, res, type, route = routes) => {
   let params = req.params[0].replace('/','').split("/")
   params[params.length] = type
-  for (let i = 0; i < params.length; i++) {
-    if (!route[params[i]]) return res.status(500).send({ error: `O endereço da API é invalido...` });
-    route = route[params[i]];
+  for (const param of params) {
+    if (!route[param]) return res.status(500).send({ error: `O endereço da API é invalido...` });
+    route = route[param];    
   }
   if (typeof route !== 'function') return res.status(500).send({ error: `O endereço da API está incompleto...` });
   route = await route(req, res)
