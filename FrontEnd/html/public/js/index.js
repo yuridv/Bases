@@ -8,8 +8,8 @@ async function verify() {
   if (!url) url = '/views/main.html'
   fetch(url, { method: 'HEAD' })
     .then(async(r) => {
-      let css = url ? url.replace('/views/','/public2/css/').replace('.html','.css') : false;
-      document.getElementById('css').href = css || `/public2/css/main.css`;
+      let css = url ? url.replace('/views/','/public/css/').replace('.html','.css') : false;
+      document.getElementById('css').href = css || `/public/css/main.css`;
       return load(document.body, url || `/views/main.html`);
     }).catch(async() => { window.location.href = '/' });
 }(function () { verify() })()
