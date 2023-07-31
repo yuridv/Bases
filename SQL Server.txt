@@ -1,0 +1,8 @@
+CREATE TABLE [dbo].[logins] (
+    [user] VARCHAR(255) NOT NULL,
+    [password] VARCHAR(255) NOT NULL,
+    [token] VARCHAR(MAX) NULL,
+    [expire] DATETIME NULL,
+    [role] VARCHAR(255) NOT NULL,
+    CONSTRAINT [PK_logins] PRIMARY KEY CLUSTERED ([user] ASC)
+);
