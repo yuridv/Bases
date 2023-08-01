@@ -1,7 +1,7 @@
 const { Errors } = require('../../Utils/functions')
 const jwt = require("jsonwebtoken");
 
-const route = async (req, res, pool) => {
+const route = async (req, res, login, pool) => {
   try {
     if (!req.body.user || !req.body.password) return { status: 400, error: `O usuário ou senha não foi informado...` }
 

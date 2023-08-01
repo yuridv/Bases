@@ -1,9 +1,14 @@
 console.log(`[BackEnd]=> Starting...`)
 require('dotenv-safe').config();
-const express = require("express");
 const routes = require('./src/Routes/routes')
+const express = require("express");
+const app = express();
+const http = require("http");
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
 
-express()
+app
   .use(express.json())
 
   .get('*', routes)
@@ -11,7 +16,11 @@ express()
   .put('*', routes)
   .delete('*', routes)
 
-  .listen(process.env.PORT || 3000, function (err) {
-    if (err) return console.log(`[BackEnd]=> Error Loading:\n${err}`)
-    console.log(`[BackEnd]=> Successfully Loaded!`)
-  });
+io.on('connection', (socket) => {
+  console.log('a user connected');
+});
+
+server.listen(process.env.PORT || 3000, async (err) => {
+  if (err) return console.log(`[BackEnd]=> Error Loading:\n${err}`)
+  console.log(`[BackEnd]=> Successfully Loaded!`)
+});

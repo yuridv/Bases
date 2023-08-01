@@ -15,8 +15,8 @@ module.exports = async (req, res) => {
   let pool = await MSSQL();
   if (pool.error) return rej(pool);
   return isAuthenticated(req, pool)
-    .then(async (user) => {
-      route = await route[req.method](req, res, pool, user)
+    .then(async (login) => {
+      route = await route[req.method](req, res, login, pool)
       if (!route) return res.status(502).send({ error: `O endereço da API não retornou uma resposta valida...` })
       return res.status(route.status || 200).send(route)
     })

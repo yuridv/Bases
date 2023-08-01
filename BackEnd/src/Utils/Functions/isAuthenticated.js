@@ -14,11 +14,11 @@ const route = (req, pool) => new Promise(async (res,rej) => {
     })
     if (token.error) return token;
 
-    let user = await pool.request().query(`
+    let login = await pool.request().query(`
       SELECT * FROM logins WHERE [token] = '${req.headers["authorization"]}' AND [expire] >= GETDATE()
     `).then(r=> r.recordset.map(r=> { return { ...r, expire: new Date(r.expire).getHours() - 3 } })[0])
-    if (!user) return rej({ status: 401, error: `O seu token é invalido ou expirou! Faça login novamente...` });
-    return res(user);
+    if (!login) return rej({ status: 401, error: `O seu token é invalido ou expirou! Faça login novamente...` });
+    return res(login);
   } catch(err) {
     return Errors(err, `AUTHENTICATED ${__dirname}`)
       .then(() => { return route(req) })
