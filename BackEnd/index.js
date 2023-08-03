@@ -16,9 +16,9 @@ app
   .put('*', routes)
   .delete('*', routes)
 
-io.on('connection', (socket) => {
-  console.log('a user connected');
-});
+// io.on('connection', (socket) => {
+  
+// });
 
 server.listen(process.env.PORT || 3000, async (err) => {
   if (err) return console.log(`[BackEnd]=> Error Loading:\n${err}`)

@@ -1,16 +1,19 @@
-<p onclick="test()">MAIN</p>
+<p>MAIN</p>
 
-<!-- <script src="/public/js/socket.io.js"></script> -->
- 
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
 <script>
-  async function test() { alert(1) }
+  async function socket() {
 
-  // (async () => {
-  //   var socket = await io('http://localhost:3000', {
-  //     transports: [ 'websocket' ],
-  //     query: { token: '' },
-  //     forceNew: true
-  //   })
-  // })();
+  }
+
+  (async () => {
+    await Timeout(1000)
+    var socket = io('http://localhost:3000', {
+      transports: [ 'websocket' ],
+      query: { token: '' },
+      forceNew: true
+    })
+  })();
 
 </script>
