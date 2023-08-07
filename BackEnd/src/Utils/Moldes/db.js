@@ -8,4 +8,7 @@ module.exports = {
   whatsapp: {
     sessions: {}
   },
+  socket: {
+    sessions: {}
+  }
 }

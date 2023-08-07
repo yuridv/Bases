@@ -1,14 +1,14 @@
 const Errors = require('./Errors')
-const { DB } = require('../moldes')
+const { db } = require('../moldes')
 const mssql = require('mssql')
 
-const route = (name) => new Promise(async (res,rej) => {
+const route = async (name) => {
   try {
     let credentials = await Credentials(name)
-    if (credentials.error) return rej(credentials);
-    if (DB.mssql[credentials.name]) return res(DB.mssql[credentials.name]);
+    if (credentials.error) return { error: credentials };
+    if (db.mssql[credentials.name]) return db.mssql[credentials.name];
 
-    DB.mssql[credentials.name] = (new mssql.ConnectionPool({
+    db.mssql[credentials.name] = (new mssql.ConnectionPool({
       server: credentials.server,
       database: credentials.name,
       user: credentials.user,
@@ -26,13 +26,13 @@ const route = (name) => new Promise(async (res,rej) => {
       options: { encrypt: false, enableArithAbort: true, trustServerCertificate: true }
     })).connect()
 
-    return res(DB.mssql[credentials.name]);
+    return db.mssql[credentials.name];
   } catch(err) {
     return Errors(err, `MSSQL ${__dirname}`)
       .then(() => { return route(name) })
-      .catch((e) => rej(e))
+      .catch((e) => { return e })
   }
-})
+}
 
 module.exports = route
 

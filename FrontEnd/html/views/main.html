@@ -1,19 +1,29 @@
-<p>MAIN</p>
+<p style="font-size: 4vh">STATUS: <span id="status"></span></p>
+<img id="qr" style="width: 50vh; height: 50vh; padding: 5vh; border-radius: 5vh; background-color: white;">
 
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 
 <script>
-  async function socket() {
-
-  }
-
-  (async () => {
+  ;(async () => {
     await Timeout(1000)
-    var socket = io('http://localhost:3000', {
+    const socket = io('http://localhost:3000', {
       transports: [ 'websocket' ],
-      query: { token: '' },
+      auth: {
+        token: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoieXVyaSIsInBhc3N3b3JkIjoieXVyaWNvbmNyZWRpdG80MzM0IiwiaWF0IjoxNjkxMzQ5OTEwfQ.RfAxynKRaXRdIp_nvV7vui_M7NuLcqcfjw5KHDsV_SM'
+      },
+      query: {  },
       forceNew: true
-    })
+    });
+
+    socket.on('change_status', async (status) => {
+      document.querySelector('#status').innerHTML = status
+      console.log('[STATUS]=> '+status)
+    });
+    socket.on('change_qr', async (qr) => {
+      document.querySelector('#qr').src = qr
+      // console.log('[QR]=> '+qr)
+    });
+
   })();
 
 </script>

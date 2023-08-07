@@ -1,11 +1,11 @@
+const WhatsApp = require('../../../Controllers/WhatsApp')
 const { Errors } = require('../../../Utils/functions')
-const { DB } = require('../../../Utils/moldes')
-const WhatsApp = require('../../../Browsers/WhatsApp')
+const { db } = require('../../../Utils/moldes')
 
 const route = async (req, res, login, pool) => {
   try {
-    let sessions = DB.whatsapp.sessions
-    if (!sessions[login.user]) sessions[login.user] = new WhatsApp()
+    let sessions = db.whatsapp.sessions
+    if (!sessions[login.user]) sessions[login.user] = new WhatsApp(login.user)
     if (!sessions[login.user].browser) await sessions[login.user].Browser()
 
     if (await sessions[login.user].isConnected()) return { status: 409, error: `A sua sessão já está conectada no WhatsApp...` }
