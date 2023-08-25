@@ -1,13 +1,13 @@
-const { Errors, Timeout } = require('../Utils/functions');
-const { db } = require('../Utils/moldes');
+const { Errors, Timeout } = require('../../Utils/functions');
+const { db } = require('../../Utils/moldes');
 const puppeteer = require('puppeteer');
-const Status = require("./Status");
 
-class WhatsApp extends Status {
+class Browser {
   constructor(session) {
-    super(session);
     this.browser = false;
     this.page = false;
+    this.queue = [];
+    this.Send();
   }
 
   async Browser() {
@@ -30,18 +30,25 @@ class WhatsApp extends Status {
     this.browser = false;
     this.status = 'Desconectado';
     this.qr = false;
-    await db.socket.sessions[this.session].emit('change_status', this.status)
-    await db.socket.sessions[this.session].emit('change_qr', this.qr)
+    if (db.socket.sessions[this.session]) {
+      await db.socket.sessions[this.session].emit('change_status', this.status)
+      await db.socket.sessions[this.session].emit('change_qr', this.qr)
+    }
   }
 
   async Page(url) {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.page.goto(url, { waitUntil: 'domcontentloaded' })
-    ])
+    try {
+      await Promise.all([
+        this.page.waitForNavigation(),
+        this.page.goto(url, { waitUntil: 'domcontentloaded' })
+      ])
+    } catch(err) {
+      console.log(err);
+      console.log(`[Browser/Page]=> ${err}`);
+    }
   }
 
-  async Wait(func, r) {
+  async Wait(func, r = 1) {
     return new Promise(async (res, rej) => {
       try {
         if (r >= 3) return rej({ error: `Não foi possivel executar a função:\n\n${typeof func == 'string' ? func : func.toISOString()}` })
@@ -50,7 +57,7 @@ class WhatsApp extends Status {
       } catch(err) {
         if ((`r: ${err}`).includes('30000ms') || (`r: ${err}`).includes('context was destroyed')) {
           await Timeout(1000)
-          return this.Wait(func, r ? r++ : 1)
+          return this.Wait(func, (r || 0) + 1)
             .then(()=>{ res({}) })
             .catch((err)=>{ rej(err) })
         } else if ((`r: ${err}`).includes('Target closed') || (`r: ${err}`).includes(`Session closed`)) {
@@ -59,12 +66,12 @@ class WhatsApp extends Status {
           return rej({ error: 'O navegador fechou! Tente novamente...' }) 
         }
         console.log(err);
-        console.log(`[Wait]=> ${err}`);
+        console.log(`[Controllers Browser/Wait]=> ${err}`);
       }
     })
   }
 
-  async Evaluate(func, args, r) {
+  async Evaluate(func, args, r = 1) {
     return new Promise(async (res, rej) => {
       try {
         if (r >= 3) return rej({ error: `Não foi possivel executar a função:\n\n${typeof func == 'string' ? func : func.toISOString()}` })
@@ -73,7 +80,7 @@ class WhatsApp extends Status {
       } catch(err) {
         if ((`r: ${err}`).includes('30000ms') || (`r: ${err}`).includes('context was destroyed')) {
           await Timeout(1000)
-          return this.Evaluate(func, args, r ? r++ : 1)
+          return this.Evaluate(func, args, (r || 0) + 1)
             .then(()=>{ res({}) })
             .catch((err)=>{ rej(err) })
         } else if ((`r: ${err}`).includes('Target closed') || (`r: ${err}`).includes(`Session closed`)) {
@@ -82,11 +89,11 @@ class WhatsApp extends Status {
           return rej({ error: 'O navegador fechou! Tente novamente...' }) 
         }
         console.log(err);
-        console.log(`[Evaluate]=> ${err}`);
+        console.log(`[Controllers Browser/Evaluate]=> ${err}`);
       }
     })
   }
 
 }
 
-module.exports = WhatsApp
+module.exports = Browser

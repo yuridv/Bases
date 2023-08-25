@@ -1,12 +1,14 @@
 console.log(`[BackEnd]=> Starting...`)
 require('dotenv-safe').config();
-const routes = require('./src/Routes/routes')
+
 const { isAuthenticated, MSSQL } = require('./src/Utils/functions')
+const routes = require('./src/Routes/routes')
 const { db } = require('./src/Utils/moldes')
+
 const express = require("express");
 const app = express();
-const http = require("http");
-const server = http.createServer(app);
+
+const server = require("http").createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 

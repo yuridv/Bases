@@ -1,4 +1,4 @@
-const WhatsApp = require('../../../Controllers/WhatsApp')
+const WhatsApp = require('../../../Controllers/WhatsApp/WhatsApp')
 const { Errors } = require('../../../Utils/functions')
 const { db } = require('../../../Utils/moldes')
 
@@ -10,9 +10,12 @@ const route = async (req, res, login, pool) => {
 
     if (await sessions[login.user].isConnected()) return { status: 409, error: `A sua sessão já está conectada no WhatsApp...` }
 
-    await sessions[login.user].Page('https://web.whatsapp.com')
+    let connect = await sessions[login.user].Page('https://web.whatsapp.com')
+    if (connect && connect.error) return connect;
 
-    return { status: 200 }
+    if (db.socket.sessions[login.user]) await db.socket.sessions[login.user].emit('change_status', { status: 'Iniciando Conexão...' })
+    
+    return { status: 201, message: 'A conexão com o WhatsApp está sendo iniciada...' }
   } catch(err) {
     return Errors(err, `ROUTE ${__dirname}/${req.method}`)
       .then(() => { return route(req, res) })

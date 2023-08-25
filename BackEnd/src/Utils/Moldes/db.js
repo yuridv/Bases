@@ -6,7 +6,10 @@ module.exports = {
     ]
   },
   whatsapp: {
-    sessions: {}
+    sessions: {},
+    messages: {
+      queue: []
+    }
   },
   socket: {
     sessions: {}

@@ -2,26 +2,34 @@ const { isAuthenticated, MSSQL } = require('../Utils/functions')
 const { readdirSync } = require("fs");
 let routes = {}
 
-module.exports = async (req, res) => {
-  req.method = req.method.toLowerCase()
-  let route = routes
-  let params = req.params[0].replace('/','').split("/")
-  for (const param of params) {
-    if (!route[param]) return res.status(500).send({ error: `O endereço da API é invalido...` });
-    route = route[param];
+const exec = async (req, res) => {
+  try {
+    req.method = req.method.toLowerCase()
+    let route = routes
+    let params = req.params[0].replace('/','').split("/")
+    for (const param of params) {
+      if (!route[param]) return res.status(500).send({ error: `O endereço da API é invalido...` });
+      route = route[param];
+    }
+    if (!route) return res.status(404).send({ error: `A URI inserida não foi encontrada...` });
+    if (!route[req.method] || typeof route[req.method] != 'function') return res.status(405).send({ error: `O metodo solicitado é invalido para essa URI...` });
+    let pool = await MSSQL();
+    if (pool.error) return res.status(pool.status || 500).send(pool);
+    return isAuthenticated(req, pool)
+      .then(async (login) => {
+        route = await route[req.method](req, res, login, pool)
+        if (!route) return res.status(502).send({ error: `O endereço da API não retornou uma resposta valida...` })
+        return res.status(route.status || 500).send(route)
+      })
+      .catch((e) => { return res.status(e.status || 401).send(e); })
+  } catch(err) {
+    return Errors(err, `ROUTES ${__dirname}`)
+    .then(() => { return route(req, res) })
+    .catch((e) => e)
   }
-  if (!route) return res.status(404).send({ error: `A URI inserida não foi encontrada...` });
-  if (!route[req.method] || typeof route[req.method] != 'function') return res.status(405).send({ error: `O metodo solicitado é invalido para essa URI...` });
-  let pool = await MSSQL();
-  if (pool.error) return rej(pool);
-  return isAuthenticated(req, pool)
-    .then(async (login) => {
-      route = await route[req.method](req, res, login, pool)
-      if (!route) return res.status(502).send({ error: `O endereço da API não retornou uma resposta valida...` })
-      return res.status(route.status || 200).send(route)
-    })
-    .catch((e) => { return res.status(e.status || 401).send(e); })
 }
+
+module.exports = exec
 
 function files(dir = '', obj = {}) {
   readdirSync('./src/Routes/'+dir).forEach(async(file) => {

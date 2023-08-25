@@ -1,4 +1,3 @@
-const WhatsApp = require('../../../Controllers/WhatsApp')
 const { Errors } = require('../../../Utils/functions')
 const { db } = require('../../../Utils/moldes')
 
@@ -11,11 +10,11 @@ const route = async (req, res, login, pool) => {
     if (!await sessions[login.user].isConnected()) return { status: 409, error: `Você já não está conectado ao WhatsApp...` }
 
     let disconnect = await sessions[login.user].Disconnect();
-    if (disconnect.error) return disconnect;
+    if (disconnect && disconnect.error) return disconnect;
 
     await sessions[login.user].Close();
 
-    return { status: 200 };
+    return { status: 200, message: 'A conexão com o WhatsApp foi desconectada...' };
   } catch(err) {
     return Errors(err, `ROUTE ${__dirname}/${req.method}`)
       .then(() => { return route(req, res) })

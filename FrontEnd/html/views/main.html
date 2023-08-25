@@ -9,19 +9,23 @@
     const socket = io('http://localhost:3000', {
       transports: [ 'websocket' ],
       auth: {
-        token: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoieXVyaSIsInBhc3N3b3JkIjoieXVyaWNvbmNyZWRpdG80MzM0IiwiaWF0IjoxNjkxMzQ5OTEwfQ.RfAxynKRaXRdIp_nvV7vui_M7NuLcqcfjw5KHDsV_SM'
+        token: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoieXVyaSIsInBhc3N3b3JkIjoieXVyaWNvbmNyZWRpdG80MzM0IiwiaWF0IjoxNjkyOTkyMTA4fQ.twfwIY4-xogzhTR_mHi7U4EIMj7RQ5IRlUq_Kf1LrJY'
       },
       query: {  },
       forceNew: true
     });
 
-    socket.on('change_status', async (status) => {
-      document.querySelector('#status').innerHTML = status
-      console.log('[STATUS]=> '+status)
+    socket.on('change_status', async (e) => {
+      document.querySelector('#status').innerHTML = e.status
+      console.log('[STATUS]=> '+e.status)
     });
-    socket.on('change_qr', async (qr) => {
-      document.querySelector('#qr').src = qr
-      // console.log('[QR]=> '+qr)
+    socket.on('change_qr', async (e) => {
+      document.querySelector('#qr').src = e.qr
+      // console.log('[QR]=> '+e.qr)
+    });
+    socket.on('send_message', async (e) => {
+      // document.querySelector('#qr').src = e
+      console.log(e)
     });
 
   })();
