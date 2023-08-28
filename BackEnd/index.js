@@ -17,8 +17,8 @@ app
 
   .get('*', routes)
   .post('*', routes)
-  .put('*', routes)
   .delete('*', routes)
+  .put('*', routes)
 
 io.on('connection', async (socket) => {
   if (!socket.handshake || !socket.handshake.auth || !socket.handshake.auth.token || !socket.handshake.query) return;
@@ -30,7 +30,7 @@ io.on('connection', async (socket) => {
       db.socket.sessions[login.user] = socket
       socket.on('disconnect', () => { 
         db.socket.sessions[login.user] = false;
-        console.log(`[${login.user}]=> Desconectado!`) 
+        console.log(`[${login.user}]=> Desconectado!`)
       });
     })
     .catch((e) => {});
