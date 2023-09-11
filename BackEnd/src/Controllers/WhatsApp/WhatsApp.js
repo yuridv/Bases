@@ -35,35 +35,35 @@ class WhatsApp extends Status {
         let pool = await MSSQL('AGILUS');
         if (pool.error) return console.log(pool);
     
-        // let client = await pool.request().query(`
-        //   ;WITH clients AS (
-        //     SELECT TOP(100)
-        //       c.con_nome 'nome'
-        //       ,c.con_telefone 'telefone'
-        //       ,ROW_NUMBER() OVER(PARTITION BY c.con_telefone ORDER BY c.con_codigo) 'r'
-        //     FROM convenio c
-        //       LEFT JOIN dash_temp_whats w ON w.client = c.con_telefone 
-        //     WHERE w.data IS NULL
-        //       AND c.con_telefone IS NOT NULL
-        //       AND c.con_nome IS NOT NULL
-        //     ORDER BY c.con_codigo DESC
-        //   )
-        //   SELECT TOP(1) telefone, nome FROM clients WHERE r = 1
-        // `).then(r=> r.recordset[0])
         let client = await pool.request().query(`
           ;WITH clients AS (
             SELECT TOP(100)
-              c.nome 'nome'
-              ,c.Telefone 'telefone'
-              ,ROW_NUMBER() OVER(PARTITION BY c.Telefone ORDER BY c.Telefone) 'r'
-            FROM dash_whats_fones c
-              LEFT JOIN dash_temp_whats w ON w.client = c.Telefone 
+              c.con_nome 'nome'
+              ,c.con_telefone 'telefone'
+              ,ROW_NUMBER() OVER(PARTITION BY c.con_telefone ORDER BY c.con_codigo) 'r'
+            FROM convenio c
+              LEFT JOIN dash_temp_whats w ON w.client = c.con_telefone 
             WHERE w.data IS NULL
-              AND c.Telefone IS NOT NULL
-              AND c.nome IS NOT NULL
+              AND c.con_telefone IS NOT NULL
+              AND c.con_nome IS NOT NULL
+            ORDER BY c.con_codigo DESC
           )
           SELECT TOP(1) telefone, nome FROM clients WHERE r = 1
         `).then(r=> r.recordset[0])
+        // let client = await pool.request().query(`
+        //   ;WITH clients AS (
+        //     SELECT TOP(100)
+        //       c.nome 'nome'
+        //       ,c.Telefone 'telefone'
+        //       ,ROW_NUMBER() OVER(PARTITION BY c.Telefone ORDER BY c.Telefone) 'r'
+        //     FROM dash_whats_fones c
+        //       LEFT JOIN dash_temp_whats w ON w.client = c.Telefone 
+        //     WHERE w.data IS NULL
+        //       AND c.Telefone IS NOT NULL
+        //       AND c.nome IS NOT NULL
+        //   )
+        //   SELECT TOP(1) telefone, nome FROM clients WHERE r = 1
+        // `).then(r=> r.recordset[0])
         if (!client) {
           console.log('[CLIENTES]=> NOT FOUND')
           await Timeout(20000)
@@ -83,8 +83,8 @@ class WhatsApp extends Status {
         }
         console.log('[START]=> ' + client.phone)
         let message = `Olá, ${client.nome}!
-Nós, da Concrédito Consignados, estamos com taxas super baixas! Venha fazer financiamentos de carros, motos e caminhões com taxas muito abaixo do mercado! Nós também fazemos refinanciamentos, utilizando seu veículo como garantia.
-Para mais informações, entre em contato com este número: +55 (51) 98298-2320.`
+Nós, da Concrédito Consignados, estamos com taxas super baixas! Estamos fazendo financiamentos de carros, motos e caminhões com taxas muito abaixo do mercado! Nós também fazemos refinanciamentos, utilizando seu veículo como garantia.
+Para mais informações, entre em contato por aqui ou com este número: +55 (51) 98298-2320.`
 
         let contact = await this.Evaluate(async (phone, message) => {
           let error_button = document.querySelector('span:nth-child(2) > div > span > div > div > div > div > div > div > div > button')
@@ -101,6 +101,7 @@ Para mais informações, entre em contato com este número: +55 (51) 98298-2320.
             return {}
           }
         }, [ client.phone, encodeURIComponent(message) ])
+
         if (contact.error) {
           await pool.request().query(`
             INSERT INTO dash_temp_whats (
@@ -112,24 +113,6 @@ Para mais informações, entre em contato com este número: +55 (51) 98298-2320.
           console.log(`[CONTACT Error ${client.telefone}]=> ` + contact.error)
           return this.Send();
         }
-
-        // await this.Wait(`
-        //   document.querySelector('span:nth-child(2) > div > div._1VZX7 > div > div > div > p > span') ||
-        //   document.querySelector('#app > div > span:nth-child(2) > div > span > div > div > div > div > div > div.f8jlpxt4.iuhl9who')
-        // `)
-
-        // let check = await this.Evaluate(async ()=> {
-        //   let error_b = document.querySelector('span:nth-child(2) > div > span > div > div > div > div > div > div > div > button')
-        //   let error = document.querySelector('#app > div > span:nth-child(2) > div > span > div > div > div > div > div > div.f8jlpxt4.iuhl9who')
-        //   if (error_b && error && error.innerHTML == 'O número de telefone compartilhado através de url é inválido.') {
-        //     error_button.click()
-        //     return { error: '[2]=> O número de telefone não foi encontrado no WhatsApp' }
-        //   }
-        //   let text = document.querySelector('span:nth-child(2) > div > div._1VZX7 > div > div > div > p > span')
-        //   if (text && text.innerHTML != '${message}') {
-        //     return { retry: 1 }
-        //   }
-        // }, [])
 
         await this.Wait(`
           document.querySelector('span:nth-child(2) > div > div._1VZX7 > div > div > div > p > span') || (
@@ -148,6 +131,8 @@ Para mais informações, entre em contato com este número: +55 (51) 98298-2320.
             let el = document.querySelector("div._2xy_p._3XKXx > button > span")
             if (!el) return { error: `Não encontrei o botão de enviar a mensagem...` }
             el.click()
+            let menu = document.querySelector('div._3vsRF > div > div > span')
+            if (menu) menu.click()
             return {}
           }
         }, [])
@@ -162,6 +147,12 @@ Para mais informações, entre em contato com este número: +55 (51) 98298-2320.
           console.log(`[SEND Error ${client.telefone}]=> ` + send.error)
           return this.Send();
         }
+        await Timeout(1500)
+        await this.Evaluate(async () => {
+          let close = document.querySelector('span:nth-child(4) > div > ul > div > div > li:nth-child(3) > div')
+          if (close) close.click()
+        }, [])
+
         await pool.request().query(`
           INSERT INTO dash_temp_whats (
             [author], [client], [result], [data]

@@ -7,7 +7,7 @@ class Browser {
     this.browser = false;
     this.page = false;
     this.queue = [];
-    this.Send();
+    // this.Send();
   }
 
   async Browser() {
