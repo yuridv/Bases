@@ -6,7 +6,7 @@
 <script>
   ;(async () => {
     await Timeout(1000)
-    const socket = io('http://localhost:3000', {
+    const socket = await io('http://localhost:3000', {
       transports: [ 'websocket' ],
       auth: {
         token: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoieXVyaSIsInBhc3N3b3JkIjoieXVyaWNvbmNyZWRpdG80MzM0IiwiaWF0IjoxNjkyOTkyMTA4fQ.twfwIY4-xogzhTR_mHi7U4EIMj7RQ5IRlUq_Kf1LrJY'
@@ -14,6 +14,8 @@
       query: {  },
       forceNew: true
     });
+
+    await socket.emit('example/example', 'testeee')
 
     socket.on('change_status', async (e) => {
       document.querySelector('#status').innerHTML = e.status
